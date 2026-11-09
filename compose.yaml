@@ -1,0 +1,46 @@
+# AIrtg collector - Docker Compose deployment. See README.md.
+#
+# Everything a component keeps lives next to this file, in its own
+# directory, owned by the user the containers run as (AIRTG_UID:AIRTG_GID of
+# .env). Create the directories before the first start:
+#
+#   mkdir -p snmp-poller/conf.d snmp-poller/data snmp-poller/logs
+#   printf 'AIRTG_UID=%s\nAIRTG_GID=%s\n' "$(id -u)" "$(id -g)" > .env
+#
+# snmp-poller/conf.d  configuration: devices, sinks, vault (hot reloaded)
+# snmp-poller/data    credentials key (key.dat: back it up), device state,
+#                     sink disk buffers
+# snmp-poller/logs    rotated log files (also on `docker compose logs`)
+
+name: airtg-collector
+
+services:
+  snmp-poller:
+    image: ghcr.io/airtg-io/airtg-collector:${AIRTG_COLLECTOR_VERSION:-0.1}
+    command: ["snmp-poller"]
+    user: "${AIRTG_UID:-10001}:${AIRTG_GID:-10001}"
+    restart: unless-stopped
+    # global.shutdown_timeout (30s) for in-flight polls, then the sinks
+    # flush: SIGKILL only after this.
+    stop_grace_period: 45s
+    volumes:
+      - ./snmp-poller/conf.d:/opt/airtg/snmp-poller/etc/conf.d
+      - ./snmp-poller/data:/opt/airtg/snmp-poller/data
+      - ./snmp-poller/logs:/opt/airtg/snmp-poller/logs
+    # Variables for ${VAR} references of the configuration files (tokens,
+    # SNMPv3 passwords, Vault secrets), if the file exists.
+    env_file:
+      - path: snmp-poller.env
+        required: false
+    environment:
+      TZ: ${TZ:-UTC}         # used with logging.local_time: true
+    # Lets sinks reach services published on the Docker host as
+    # host.docker.internal (e.g. http://host.docker.internal:9090/api/v1/write).
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    # Console logs, read with `docker compose logs`: rotated by Docker.
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "5"

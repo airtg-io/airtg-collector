@@ -1,0 +1,8 @@
+# Build outputs (make package)
+/dist/
+
+# A local deployment made in the repository (see README.md): configuration
+# with credentials, credentials key, state, logs.
+/snmp-poller/
+/.env
+/*.env
