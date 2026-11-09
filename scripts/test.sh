@@ -92,7 +92,7 @@ sealed() { grep -q 'community: ~~[0-9A-Fa-f]*~~' "$devices"; }
 eventually sealed || fail "community not encrypted in conf.d/devices.yaml: $(cat "$devices")"
 ! grep -q test-community-secret "$devices" || fail "clear-text community left in conf.d/devices.yaml"
 ! logs | grep -q test-community-secret || fail "community logged"
-[ -O "$devices" ] || fail "conf.d/devices.yaml is no longer owned by the deployment user"
+[ -n "$(find "$devices" -prune -user "$(id -u)")" ] || fail "conf.d/devices.yaml is no longer owned by the deployment user (uid $(id -u))"
 ok "conf.d credentials encrypted in place, still owned by the deployment user, not logged"
 
 [ -s "$tmp/snmp-poller/data/key.dat" ] || fail "no snmp-poller/data/key.dat"
