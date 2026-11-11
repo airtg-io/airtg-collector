@@ -19,7 +19,7 @@ Licensed under the GNU GPL v3 (see [LICENSE](LICENSE)).
 
 | Component | Version | Documentation |
 |-----------|---------|---------------|
-| snmp-poller | 0.2 | [airtg-io/snmp-poller v0.2](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md) |
+| snmp-poller | 0.3 | [airtg-io/snmp-poller v0.3](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md) |
 
 Only the SNMP poller is available for now. Every option of a component is documented in its
 own README: this one covers running it in Docker.
@@ -43,7 +43,7 @@ reach `ghcr.io` [load the image from a release](#without-registry-access).
 
 ```sh
 mkdir airtg-collector && cd airtg-collector
-curl -fsSLO https://raw.githubusercontent.com/airtg-io/airtg-collector/v0.1/compose.yaml
+curl -fsSLO https://raw.githubusercontent.com/airtg-io/airtg-collector/v0.2/compose.yaml
 
 # The directories the containers write to, owned by you, and the user the containers run as.
 mkdir -p snmp-poller/conf.d snmp-poller/data snmp-poller/logs
@@ -101,7 +101,7 @@ by `docker compose`), so a new `compose.yaml` replaces the old one without losin
 ## Configuration
 
 The configuration of the poller is documented in its
-[README](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#configuration-reference).
+[README](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#configuration-reference).
 In the container, the files are:
 
 | Container path | Holds | How to change it |
@@ -137,7 +137,7 @@ configuration and applies it, or logs an `error` and keeps the previous one. See
 
 ### Credentials
 
-Three ways, from the poller's [credentials](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#credentials-encryption)
+Three ways, from the poller's [credentials](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#credentials-encryption)
 documentation:
 
 - **In clear text in `conf.d`**: encrypted in place (`~~HEX~~`) on startup and reload, with
@@ -163,7 +163,7 @@ documentation:
 
   Changes of `snmp-poller.env` apply on `docker compose up -d`, which recreates the container.
 - **HashiCorp Vault**: a `vault:` block in a file of `conf.d`, see the poller's
-  [Vault](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#vault) documentation.
+  [Vault](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#vault) documentation.
 
 ### Main configuration file
 
@@ -190,7 +190,7 @@ conf.d` and `capabilities_dir: capabilities.d`, the paths the mounts expect. `lo
 ### Capabilities
 
 A capability file (what to poll on which devices, see the poller's
-[Capabilities](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#capabilities))
+[Capabilities](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#capabilities))
 is added by mounting it next to the shipped ones:
 
 ```yaml
@@ -217,7 +217,7 @@ Capability files are hot reloaded too.
 
 The poller sends what it polls to **sinks**: Prometheus remote write and InfluxDB, configured
 in a file of `snmp-poller/conf.d` (every option is in the poller's
-[sinks](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#sinks) documentation).
+[sinks](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#sinks) documentation).
 The database is never polled: the poller connects to it, so only the database needs to accept
 connections. From the container, a database is reached at:
 
@@ -229,6 +229,9 @@ connections. From the container, a database is reached at:
 | A container of another Compose project | Its service name, once both share a network, see [below](#database-in-another-compose-project). |
 
 `localhost` is the container itself: it never reaches a database.
+
+The poller can also send to the AIrtg analyzer (sink `type: airtg`, nothing else to set). Its
+address is fixed to `127.0.0.1`: see the [AIrtg analyzer](#ports-and-network) note on networking.
 
 ### Prometheus
 
@@ -282,7 +285,7 @@ sinks:
 
 Create the token with `influxdb3 create token --admin` (or a token that can write the
 database). InfluxDB 2 serves the same `/api/v2/write` endpoint, `database` being the bucket:
-see the poller's [InfluxDB](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#influxdb-3)
+see the poller's [InfluxDB](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#influxdb-3)
 documentation.
 
 ### TLS and authentication
@@ -388,7 +391,7 @@ Docker host. It only opens outbound connections:
   With `network_mode: host`, `localhost` is the Docker host: a database on the host is
   `http://localhost:9090`, and the service names of other containers no longer resolve.
 
-- **AIrtg analyzer**: snmp-poller's `airtg` sink (in the snmp-poller release that adds it)
+- **AIrtg analyzer**: snmp-poller's `airtg` sink (snmp-poller 0.3 and later)
   publishes to the analyzer's NATS server at the fixed address `nats://127.0.0.1:4222`. It
   works only when the analyzer shares the poller's network: inside the `snmp-poller` container,
   `127.0.0.1` is the container itself, not the Docker host or another container. The analyzer
@@ -415,7 +418,7 @@ zcat snmp-poller/logs/snmp-poller-*.log.gz | less     # rotated files
 | `docker compose logs` | Until the container is removed (`docker compose down`, upgrades) | By Docker: 5 files of 10MB (`logging` of `compose.yaml`) |
 | `snmp-poller/logs/` | Across upgrades and container removal | By the poller: 50MB per file, 10 files, 30 days, gzip |
 
-What to look for (details in the poller's [Logs](https://github.com/airtg-io/snmp-poller/blob/v0.2/README.md#logs)
+What to look for (details in the poller's [Logs](https://github.com/airtg-io/snmp-poller/blob/v0.3/README.md#logs)
 documentation):
 
 - `msg="poller stats"` every minute: devices, polls ok and failed, `queued` (constantly above
@@ -525,10 +528,10 @@ reach `ghcr.io`:
 
 ```sh
 sha256sum -c --ignore-missing SHA256SUMS
-gunzip -c airtg-collector-0.1-linux-amd64.tar.gz | docker load   # linux-arm64 on ARM hosts
+gunzip -c airtg-collector-0.2-linux-amd64.tar.gz | docker load   # linux-arm64 on ARM hosts
 ```
 
-It loads `ghcr.io/airtg-io/airtg-collector:0.1`, the image `compose.yaml` runs. Then start as
+It loads `ghcr.io/airtg-io/airtg-collector:0.2`, the image `compose.yaml` runs. Then start as
 usual; `docker compose pull` is not needed.
 
 ### Without Docker Compose
@@ -541,7 +544,7 @@ docker run -d --name snmp-poller --restart unless-stopped \
   -v "$PWD/snmp-poller/data:/opt/airtg/snmp-poller/data" \
   -v "$PWD/snmp-poller/logs:/opt/airtg/snmp-poller/logs" \
   --log-opt max-size=10m --log-opt max-file=5 \
-  ghcr.io/airtg-io/airtg-collector:0.1 snmp-poller
+  ghcr.io/airtg-io/airtg-collector:0.2 snmp-poller
 docker logs -f snmp-poller
 ```
 
@@ -555,7 +558,7 @@ Then delete the deployment directory, once its backup is no longer needed.
 
 ## The image
 
-`ghcr.io/airtg-io/airtg-collector`, tags `<version>` (e.g. `0.1`) and `latest`, for linux/amd64
+`ghcr.io/airtg-io/airtg-collector`, tags `<version>` (e.g. `0.2`) and `latest`, for linux/amd64
 and linux/arm64.
 
 | Path | Content |
@@ -567,13 +570,13 @@ and linux/arm64.
 
 - Working directory `/opt/airtg/snmp-poller`, default command `snmp-poller`, user `10001:10001`.
   No entrypoint: the command is the component and its arguments, e.g.
-  `docker run --rm ghcr.io/airtg-io/airtg-collector:0.1 snmp-poller -version`.
+  `docker run --rm ghcr.io/airtg-io/airtg-collector:0.2 snmp-poller -version`.
 - Alpine Linux (a shell for `docker compose exec`, CA certificates, time zones).
 - Labels: `org.opencontainers.image.version` (the collector version),
   `org.opencontainers.image.revision` (its commit) and `io.airtg.snmp-poller.version`:
 
   ```sh
-  docker image inspect -f '{{json .Config.Labels}}' ghcr.io/airtg-io/airtg-collector:0.1
+  docker image inspect -f '{{json .Config.Labels}}' ghcr.io/airtg-io/airtg-collector:0.2
   ```
 
 ## Development
@@ -615,7 +618,7 @@ file and a clean stop.
    [components table](#components) (`make check` verifies they match), and the links to its
    documentation in this README.
 2. Bump `VERSION` and the default image tag of `compose.yaml` (`make check` verifies they
-   match too), and the `0.1` examples of this README.
+   match too), and the `0.2` examples of this README.
 3. `make`, then push to `main`: CI releases the new version.
 
 ### Adding a component
@@ -626,7 +629,7 @@ service to `compose.yaml` with its directories under `./<component>/`, its tests
 
 ### Versions and releases
 
-The version is in the `VERSION` file (`MAJOR.MINOR` or `MAJOR.MINOR.PATCH`, currently `0.1`),
+The version is in the `VERSION` file (`MAJOR.MINOR` or `MAJOR.MINOR.PATCH`, currently `0.2`),
 in the image label `org.opencontainers.image.version` and its tag.
 
 GitHub Actions (`.github/workflows/docker.yml`) runs on every push to `main` and every pull

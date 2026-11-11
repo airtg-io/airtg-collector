@@ -16,7 +16,7 @@ name: airtg-collector
 
 services:
   snmp-poller:
-    image: ghcr.io/airtg-io/airtg-collector:${AIRTG_COLLECTOR_VERSION:-0.1}
+    image: ghcr.io/airtg-io/airtg-collector:${AIRTG_COLLECTOR_VERSION:-0.2}
     command: ["snmp-poller"]
     user: "${AIRTG_UID:-10001}:${AIRTG_GID:-10001}"
     restart: unless-stopped

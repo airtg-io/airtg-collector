@@ -8,7 +8,7 @@ User-facing docs live in `README.md`; keep both current.
 - **Components come from their public GitHub releases**, never built from source: `Dockerfile`
   downloads the linux archive from `releases/download/v<version>/` (plain URLs, no token, no
   API rate limit) and checks it against the release's `SHA256SUMS`. Versions: one global `ARG <COMPONENT>_VERSION` in the Dockerfile. Current:
-  snmp-poller 0.2.
+  snmp-poller 0.3.
 - **No emulation**: download stages run on `$BUILDPLATFORM`; the final stage only COPYs (no RUN),
   so both platforms (linux/amd64, linux/arm64) build anywhere.
 - **Layout**: `/opt/airtg/<component>` is the working directory of its service (relative paths
@@ -24,6 +24,10 @@ User-facing docs live in `README.md`; keep both current.
   push to main whose version has no tag `v<version>` pushes `ghcr.io/airtg-io/airtg-collector:
   <version>` and `:latest`, creates the tag and a GitHub release with the `docker save`
   archives + SHA256SUMS. Never create release tags by hand.
+- **AIrtg analyzer**: snmp-poller's `airtg` sink (0.3+) publishes to the fixed
+  `nats://127.0.0.1:4222`; the analyzer is not in the image yet (bundling it in the poller's
+  container is planned), so it must share the poller's network namespace (README "Ports and
+  network").
 - **Updating a component**: Dockerfile ARG, README components table and links, bump VERSION and
   the compose.yaml default tag (see README "Updating a component").
 

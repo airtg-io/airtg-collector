@@ -11,7 +11,7 @@
 # releases and checked against the release's SHA256SUMS.
 
 ARG ALPINE_VERSION=3.22
-ARG SNMP_POLLER_VERSION=0.2
+ARG SNMP_POLLER_VERSION=0.3
 
 # Downloads run on the build machine whatever the target platform: nothing
 # is executed for the target architecture, so multi-platform builds need no
