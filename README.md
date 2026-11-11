@@ -366,6 +366,7 @@ Docker host. It only opens outbound connections:
 | Prometheus remote write and compatible | TCP, HTTP(S): Prometheus 9090, VictoriaMetrics 8428, Mimir 8080, ... | Sinks' `url` |
 | InfluxDB | TCP, HTTP(S): InfluxDB 3 8181 | Sinks' `url` |
 | HashiCorp Vault (optional) | TCP, HTTP(S) 8200 | `vault.address` |
+| AIrtg analyzer (optional) | TCP, NATS 4222 on `127.0.0.1` | Fixed, see below |
 | DNS | UDP/TCP 53 | The Docker host's resolver, for device and sink host names |
 
 - **Source address**: on the default bridge network, the devices see SNMP requests coming from
@@ -386,6 +387,14 @@ Docker host. It only opens outbound connections:
 
   With `network_mode: host`, `localhost` is the Docker host: a database on the host is
   `http://localhost:9090`, and the service names of other containers no longer resolve.
+
+- **AIrtg analyzer**: snmp-poller's `airtg` sink (in the snmp-poller release that adds it)
+  publishes to the analyzer's NATS server at the fixed address `nats://127.0.0.1:4222`. It
+  works only when the analyzer shares the poller's network: inside the `snmp-poller` container,
+  `127.0.0.1` is the container itself, not the Docker host or another container. The analyzer
+  is not part of this image yet; bundling it in the same container as the poller is planned.
+  Until then, run it with the poller's network namespace (`network_mode: "service:snmp-poller"`
+  on the analyzer's service), or run both on the host network (`network_mode: host`).
 
 ## Logs
 
