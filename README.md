@@ -13,7 +13,7 @@ Docker Compose.
 - **Released like the components**: a new version in `VERSION` pushed to `main` publishes the
   image to `ghcr.io/airtg-io/airtg-collector` and a GitHub release.
 
-Licensed under the GNU GPL v3 (see [LICENSE](LICENSE)).
+Copyright (C) 2026 AIrtg Solutions, inc. Licensed under the GNU GPL v3 (see [LICENSE](LICENSE)).
 
 ## Components
 

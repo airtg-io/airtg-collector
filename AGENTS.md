@@ -34,6 +34,5 @@ User-facing docs live in `README.md`; keep both current.
 ## Testing notes
 
 - `make` = check + build + test (needs Docker).
-- Without Docker, the image can be approximated: build the component's release archive from its
-  tag (`git worktree add <scratch> v<version>`, `make package`), extract it, `mkdir data logs`,
-  and run the scenario of `scripts/test.sh` from that directory.
+- End-to-end testing, with Docker or approximated without it: the `e2e` skill,
+  `.claude/skills/e2e/SKILL.md`.
