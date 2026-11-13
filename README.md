@@ -108,7 +108,7 @@ In the container, the files are:
 |----------------|-------|------------------|
 | `etc/snmp-poller.yaml` | Main file: `global` (threads, intervals, timeouts, ...) and `logging`, with the defaults. | [Replace it](#main-configuration-file) |
 | `etc/conf.d/*.yaml` | Devices, sinks, vault: everything else. | Files of `snmp-poller/conf.d` |
-| `etc/capabilities.d/*.yaml` | What to poll: `system`, `interfaces`, `entity`, `host-resources`. | [Add or replace them](#capabilities) |
+| `etc/capabilities.d/*.yaml` | What to poll: `system`, `interfaces`, `entity`, `host-resources`, `cisco-cpu`, `cisco-enhanced-mempool`, `cisco-memory-pool`, `juniper-cpu`, `juniper-memory`. | [Add or replace them](#capabilities) |
 
 Paths are relative to `/opt/airtg/snmp-poller`, the working directory.
 
@@ -206,7 +206,7 @@ starting from a copy of the shipped ones:
 
 ```sh
 mkdir -p snmp-poller/capabilities.d
-for f in system interfaces entity host-resources; do
+for f in system interfaces entity host-resources cisco-cpu cisco-enhanced-mempool cisco-memory-pool juniper-cpu juniper-memory; do
   docker compose run --rm --no-deps -T snmp-poller cat etc/capabilities.d/$f.yaml > snmp-poller/capabilities.d/$f.yaml
 done
 ```
