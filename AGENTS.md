@@ -23,7 +23,9 @@ User-facing docs live in `README.md`; keep both current.
   checks, tests (`scripts/test.sh`, deploys with compose.yaml) and packages every push/PR; a
   push to main whose version has no tag `v<version>` pushes `ghcr.io/airtg-io/airtg-collector:
   <version>` and `:latest`, creates the tag and a GitHub release with the `docker save`
-  archives + SHA256SUMS. Never create release tags by hand.
+  archives + SHA256SUMS. Never create release tags by hand. The ghcr.io package is public (set
+  once by the user in its Package settings: GitHub creates packages private, and a workflow
+  cannot change it); a new package, e.g. for another image, must be made public the same way.
 - **AIrtg analyzer**: snmp-poller's `airtg` sink (0.3+) publishes to the fixed
   `nats://127.0.0.1:4222`; the analyzer is not in the image yet (bundling it in the poller's
   container is planned), so it must share the poller's network namespace (README "Ports and
